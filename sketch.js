@@ -88,6 +88,7 @@ class FlowLine {
 let video;
 let poseNet;
 let poses = [];
+let showNose = false;
 
 // --- variables for finetuning on stage
 let flowSpeed;            // speed/dir for FlowLine, can be pos or neg, change in mouse pressed
@@ -142,12 +143,16 @@ function detectNose() {
       if (keypoint.score > 0.2) {
         let noseSize = keypoint.score * 20
         // -- Tracker for Nose
-        noFill();
-        stroke(307, 100, 100, 50);
-        strokeWeight(0.2)
-        ellipse(keypoint.position.x, keypoint.position.y, noseSize, noseSize);
-        line(keypoint.position.x-10, keypoint.position.y-10, keypoint.position.x+10, keypoint.position.y+10)
-        line(keypoint.position.x+10, keypoint.position.y-10, keypoint.position.x-10, keypoint.position.y+10)
+        if (showNose == true) {
+          push()
+          noFill();
+          stroke(310,100,100,100)
+          strokeWeight(0.2)
+          ellipse(keypoint.position.x, keypoint.position.y, noseSize, noseSize);
+          line(keypoint.position.x-10, keypoint.position.y-10, keypoint.position.x+10, keypoint.position.y+10)
+          line(keypoint.position.x+10, keypoint.position.y-10, keypoint.position.x-10, keypoint.position.y+10)
+          pop()
+        }
 
         if (keypoint.position.x < width/2) {
           flowSpeed = -1*flowSpeedMultip;
@@ -163,6 +168,15 @@ function detectNose() {
     }    
   }
 }
+
+// ---- Nose Marker ein- und ausblenden ------
+const keyHandlerNoseToggle = (event) => {
+  if (event.key === " ") {
+    showNose = !showNose;
+    console.log("Nose Marker Toggle")
+  }
+};
+document.addEventListener("keypress", keyHandlerNoseToggle);
 
 function setup() {
   colorMode(HSB, 360, 100, 100, 100); // set colormode to HSB
@@ -187,7 +201,8 @@ function modelReady() {
 }
 
 function draw() {
-  background(240, 5, 5, 100);      // Background color HSB
+  // background(240, 5, 5, 100);      // Background color HSB
+  background(0, 0, 100, 100);      // Background color HSB
   // Flip video capture
   translate(video.width, 0);
   scale(-1, 1);
